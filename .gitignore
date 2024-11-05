@@ -1,5 +1,6 @@
 .vscode
 
+log
 .dub
 docs.json
 __dummy.html
@@ -16,3 +17,8 @@ getsomelock-test-*
 *.o
 *.obj
 *.lst
+
+*.log
+
+logo.ico
+logo.png

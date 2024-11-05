@@ -1,4 +1,0 @@
-[20:09:45][info][Test]正在启动。
-[20:10:00][info][Test]加锁中...
-[20:10:00][info][Test]检测到文件夹。
-[20:10:00][debug][Test]["C:/Misc/Code/D/GetSomeLock/test/input/test0.txt", "C:/Misc/Code/D/GetSomeLock/test/input/test1.txt", "C:/Misc/Code/D/GetSomeLock/test/input/test2.txt"]
