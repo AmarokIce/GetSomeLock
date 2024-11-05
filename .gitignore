@@ -5,6 +5,9 @@ log
 docs.json
 __dummy.html
 docs/
+test
+
+
 /getsomelock
 getsomelock.so
 getsomelock.dylib
@@ -19,6 +22,7 @@ getsomelock-test-*
 *.lst
 
 *.log
+*.dll
 
 logo.ico
 logo.png
