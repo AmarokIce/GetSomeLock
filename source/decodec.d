@@ -1,52 +1,48 @@
 module decodec;
 
 import std.conv : to;
-import app;
 
-string decrypt(string keyword, string text) {
-    string str = "";
-
+ubyte[] decrypt(string keyword, ubyte[] pBytes) {
+    ubyte[] bytes = new ubyte[0];
     int indexKey = 0;
-    foreach (char c; text) {
+    foreach (ubyte c; pBytes) {
         char k = keyword[indexKey++];
-        int cK = to!uint(k);
-        int cC = to!uint(c);
+        ubyte cK = to!ubyte(k);
 
-        str ~= to!char(cC - cK);
+        bytes ~= c ^ cK;
 
         if (indexKey == keyword.length) {
             indexKey = 0;
         }
     }
 
-    return str;
+    return bytes;
 }
 
-void decryptTo(string keyword, string text, string* object) {
-    *object ~= decrypt(keyword, text);
+void decryptTo(string keyword, ubyte[] bytes, ubyte[]* object) {
+    *object ~= decrypt(keyword, bytes);
 }
 
 bool decryptFromFile(string keyword, string filePath, string newPath = "./", string defPath = "") {
-    import std.string;
-    import std.file;
+    import std.array, std.string, std.file;
 
     ubyte[] bytes = cast(ubyte[]) read(filePath);
-    string text = "";
-    foreach (ubyte b; bytes) {
-        text ~= to!char(b);
-    }
-
-    string[] lines = text.replace("\r", "").split("\n");
+    ubyte[][] lines = bytes.split(to!ubyte('\n'));
 
     string hash = to!string(hashOf(keyword));
-
     if (lines[0] != hash) {
         return false;
     }
 
-    string[] info = decrypt(keyword, lines[1]).split(";");
-    string fileName = info[0];
-    string fileType = info[1];
+    ubyte[] infoByte = decrypt(keyword, lines[1]);
+    string info = "";
+    foreach(ubyte b; infoByte) {
+        info ~= to!char(b);
+    }
+
+    string[] infoData = info.split(";");
+    string fileName = infoData[0];
+    string fileType = infoData[1];
 
     fileName = (fileName == "NaN" ? "" : fileName) ~ (fileType == "NaN" ? "" : "." ~ fileType);
 
@@ -55,7 +51,8 @@ bool decryptFromFile(string keyword, string filePath, string newPath = "./", str
         mkdir(newPath ~ patch);
     }
 
-    string data = decrypt(keyword, lines[2]);
+    ubyte[] data;
+    decryptTo(keyword, lines[2], &data);
     write(newPath ~ patch ~ fileName, data);
     return true;
 }

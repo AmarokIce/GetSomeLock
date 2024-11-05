@@ -1,23 +1,15 @@
 module encodec;
 import std.conv : to;
 
-/**
- * Encrypt the object.
- *
- * Params:
- *   keyword = The key for encrypt.
- *   text = The object will encrypt.
- */
-char[] encrypt(string keyword, string text) {
-    char[] bytes = new char[0];
+ubyte[] encrypt(string keyword, ubyte[] pBytes) {
+    ubyte[] bytes = new ubyte[0];
 
     int indexKey = 0;
-    foreach (char c; text) {
+    foreach (ubyte c; pBytes) {
         char k = keyword[indexKey++];
-        int cK = to!uint(k);
-        int cC = to!uint(c);
+        ubyte cK = to!ubyte(k);
 
-        bytes ~= to!char(cC + cK);
+        bytes ~= c ^ cK;
 
         if (indexKey == keyword.length) {
             indexKey = 0;
@@ -27,11 +19,8 @@ char[] encrypt(string keyword, string text) {
     return bytes;
 }
 
-/**
-* A function for thread
-*/
-void encryptTo(string keyword, string text, string* object) {
-    *object ~= encrypt(keyword, text);
+void encryptTo(string keyword, ubyte[] bytes, ubyte[]* object) {
+    *object ~= encrypt(keyword, bytes);
 }
 
 void encryptToFile(string keyword, string filePath, string newPath = "./", string defPath = "") {
@@ -41,13 +30,9 @@ void encryptToFile(string keyword, string filePath, string newPath = "./", strin
 
 
     ubyte[] bytes = cast(ubyte[]) read(filePath);
-    string text = "";
-    foreach (ubyte b; bytes) {
-        text ~= to!char(b);
-    }
 
-    string output;
-    encryptTo(keyword, text, &output);
+    ubyte[] output;
+    encryptTo(keyword, bytes, &output);
 
     string[] arr = filePath.split("/");
     string name = arr[$ - 1];
@@ -70,18 +55,26 @@ void encryptToFile(string keyword, string filePath, string newPath = "./", strin
     }
 
     string hash = to!string(hashOf(keyword));
-
-    string type = to!string(encrypt(keyword, realName ~ ";" ~ fileType));
-
     string patch = (filePath.replace(defPath, "").replace(name, "")).replace("//", "/");
+
+    string namePatchString = realName ~ ";" ~ fileType;
+    ubyte[] patchByte = new ubyte[0];
+    foreach(char c; namePatchString) {
+        patchByte ~= to!ubyte(c);
+    }
+
+    ubyte[] namePatch;
+    encryptTo(keyword, patchByte, &namePatch);
 
     if (!exists(newPath ~ patch)) {
         mkdir(newPath ~ patch);
     }
 
     write(newPath ~ patch ~ realName ~ ".lock", hash ~ "\n");
-    append(newPath ~ patch ~ realName ~ ".lock", type ~ "\n");
-    append(newPath ~ patch ~ realName ~ ".lock", output ~ "\n");
+
+    // TODO - Will fix
+    append(newPath ~ patch ~ realName ~ ".lock", namePatch ~ '\n');
+    append(newPath ~ patch ~ realName ~ ".lock", output);
 }
 
 import std.concurrency;

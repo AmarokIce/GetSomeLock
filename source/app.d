@@ -21,7 +21,6 @@ extern (C) int UIAppMain(string[] args) {
     Platform.instance.uiTheme = "theme_default";
     Platform.instance.uiLanguage = "en";
     Platform.instance.resourceDirs = resourceDirs;
-    embeddedResourceList.addResources(embedResourcesFromList!("resources.list")());
 
     // Platform.instance.defaultWindowIcon("gsl-logo.png");
 
@@ -72,6 +71,7 @@ void createPasswordAndControl(TableLayout tablelayout) {
     buttonLocked.click = delegate(Widget src) {
         if (!checkInfo()) {
             window.showMessageBox("错误", "缺少输入/输出路径或密码为空！");
+
             return true;
         }
 
@@ -84,11 +84,15 @@ void createPasswordAndControl(TableLayout tablelayout) {
     buttonUnlock.click = delegate(Widget src) {
         if (!checkInfo()) {
             window.showMessageBox("错误", "缺少输入/输出路径或密码为空！");
+            return true;
         }
 
-        unlock();
-        window.showMessageBox("成功", "完成！");
-
+        bool hasFails = unlock();
+        if (!hasFails) {
+            window.showMessageBox("警告", "工作已结束，但存在未能解锁的文件，这可能是因为密码不正确！");
+        } else {
+            window.showMessageBox("成功", "完成！");
+        }
         return true;
     };
 
@@ -147,7 +151,6 @@ void lock() {
     }
 
     auto str = to!string(paths);
-
 
     encryptToFiles(password, paths, null, outputPath, inputPath);
 }
