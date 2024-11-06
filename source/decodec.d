@@ -24,7 +24,7 @@ void decryptTo(string keyword, ubyte[] bytes, ubyte[]* object) {
 }
 
 bool decryptFromFile(string keyword, string filePath, string newPath = "./", string defPath = "") {
-    import std.array, std.string, std.file;
+    import std.string, std.file;
 
     ubyte[] bytes = cast(ubyte[]) read(filePath);
     ubyte[] headRaw = bytes.split(to!ubyte('\n'))[0];

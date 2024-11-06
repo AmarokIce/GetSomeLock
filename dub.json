@@ -1,14 +1,12 @@
 {
-	"authors": [
-		"AmarokIce"
-	],
-	"copyright": "Copyright © 2024, AmarokIce",
-	"dependencies": {
-		"dlangui": "0.10.8",
-		"esstool": "~>0.0.3",
-		"log4d": "1.0.3"
-	},
-	"description": "A file locker application.",
-	"license": "MPL-2.0",
-	"name": "getsomelock"
+    "authors": [
+        "AmarokIce"
+    ],
+    "copyright": "Copyright © 2024, AmarokIce",
+    "dependencies": {
+        "dlangui": "0.10.8"
+    },
+    "description": "A file locker application.",
+    "license": "MPL-2.0",
+    "name": "getsomelock"
 }

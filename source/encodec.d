@@ -1,4 +1,5 @@
 module encodec;
+
 import std.conv : to;
 
 ubyte[] encrypt(string keyword, ubyte[] pBytes) {
@@ -24,9 +25,7 @@ void encryptTo(string keyword, ubyte[] bytes, ubyte[]* object) {
 }
 
 void encryptToFile(string keyword, string filePath, string newPath = "./", string defPath = "") {
-    import std.file, std.string;
-    import esstool.arrayutil : len;
-    import esstool.stringbuilder : StringBuilder;
+    import std.string, std.file;
 
     ubyte[] bytes = cast(ubyte[]) read(filePath);
 
@@ -37,21 +36,8 @@ void encryptToFile(string keyword, string filePath, string newPath = "./", strin
     string name = arr[$ - 1];
     arr = name.split(".");
 
-    string realName;
-    string fileType;
-
-    if (arr.length < 2) {
-        if (new StringBuilder(name).indexOf(".") != -1) {
-            realName = name;
-            fileType = "NaN";
-        } else {
-            realName = "NaN";
-            fileType = arr[0];
-        }
-    } else {
-        realName = arr[0];
-        fileType = arr[1];
-    }
+    string realName = arr[0];
+    string fileType = arr[1];
 
     string hash = to!string(hashOf(keyword));
     string patch = (filePath.replace(defPath, "").replace(name, "")).replace("//", "/");
