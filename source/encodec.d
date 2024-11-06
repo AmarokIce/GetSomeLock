@@ -28,7 +28,6 @@ void encryptToFile(string keyword, string filePath, string newPath = "./", strin
     import esstool.arrayutil : len;
     import esstool.stringbuilder : StringBuilder;
 
-
     ubyte[] bytes = cast(ubyte[]) read(filePath);
 
     ubyte[] output;
@@ -41,7 +40,7 @@ void encryptToFile(string keyword, string filePath, string newPath = "./", strin
     string realName;
     string fileType;
 
-    if (len(arr) < 2) {
+    if (arr.length < 2) {
         if (new StringBuilder(name).indexOf(".") != -1) {
             realName = name;
             fileType = "NaN";
@@ -56,24 +55,12 @@ void encryptToFile(string keyword, string filePath, string newPath = "./", strin
 
     string hash = to!string(hashOf(keyword));
     string patch = (filePath.replace(defPath, "").replace(name, "")).replace("//", "/");
-
-    string namePatchString = realName ~ ";" ~ fileType;
-    ubyte[] patchByte = new ubyte[0];
-    foreach(char c; namePatchString) {
-        patchByte ~= to!ubyte(c);
-    }
-
-    ubyte[] namePatch;
-    encryptTo(keyword, patchByte, &namePatch);
-
     if (!exists(newPath ~ patch)) {
         mkdir(newPath ~ patch);
     }
 
-    write(newPath ~ patch ~ realName ~ ".lock", hash ~ "\n");
-
-    // TODO - Will fix
-    append(newPath ~ patch ~ realName ~ ".lock", namePatch ~ '\n');
+    write(newPath ~ patch ~ realName ~ ".lock", hash ~ ";");
+    append(newPath ~ patch ~ realName ~ ".lock", fileType ~ '\n');
     append(newPath ~ patch ~ realName ~ ".lock", output);
 }
 

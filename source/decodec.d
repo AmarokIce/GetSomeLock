@@ -27,32 +27,27 @@ bool decryptFromFile(string keyword, string filePath, string newPath = "./", str
     import std.array, std.string, std.file;
 
     ubyte[] bytes = cast(ubyte[]) read(filePath);
-    ubyte[][] lines = bytes.split(to!ubyte('\n'));
+    ubyte[] headRaw = bytes.split(to!ubyte('\n'))[0];
+    ubyte[][] infoHead = headRaw.split(';');
 
     string hash = to!string(hashOf(keyword));
-    if (lines[0] != hash) {
+    if (infoHead[0] != hash) {
         return false;
     }
 
-    ubyte[] infoByte = decrypt(keyword, lines[1]);
-    string info = "";
-    foreach(ubyte b; infoByte) {
-        info ~= to!char(b);
-    }
+    string fileName = filePath.replace(defPath, "").split("/")[$ - 1].split(".")[0];
+    string fileType = cast(string) infoHead[1];
 
-    string[] infoData = info.split(";");
-    string fileName = infoData[0];
-    string fileType = infoData[1];
+    fileName ~= fileType == "NaN" ? "" : "." ~ fileType;
 
-    fileName = (fileName == "NaN" ? "" : fileName) ~ (fileType == "NaN" ? "" : "." ~ fileType);
+    bytes = bytes[headRaw.length + 1 .. $];
+    ubyte[] data = decrypt(keyword, bytes);
 
     auto patch = filePath.replace(defPath, "").replace(filePath.split("/")[$ - 1], "");
     if (!exists(newPath ~ patch)) {
         mkdir(newPath ~ patch);
     }
 
-    ubyte[] data;
-    decryptTo(keyword, lines[2], &data);
     write(newPath ~ patch ~ fileName, data);
     return true;
 }
